@@ -8,10 +8,28 @@
 </head>
 <body>
   <header>
-    <h1>Catálogo de Produtos</h1>
+        <h1>Catálogo de Produtos</h1>
+        <button id="toggle-cart">🛒 Carrinho</button>
   </header>
   <main>
     <div id="product-catalog" class="product-catalog"></div>
+    <div id="product-catalog" class="product-catalog"></div>
+
+    <aside id="cart" class="cart">
+       <button id="close-cart" class="close-cart">&times;</button>
+  <h2>Carrinho de Compras</h2>
+  <ul id="cart-items"></ul>
+  <p><strong>Total:</strong> R$ <span id="cart-total">0.00</span></p>
+
+  <div class="payment-method">
+    <p><strong>Forma de pagamento:</strong></p>
+    <label><input type="radio" name="payment" value="cartao"> Cartão de Crédito</label><br>
+    <label><input type="radio" name="payment" value="pix"> PIX</label><br>
+    <label><input type="radio" name="payment" value="boleto"> Boleto</label>
+  </div>
+
+  <button id="checkout-button">Finalizar Compra</button>
+    </aside>
   </main>
   <script src="script.js"></script>
 </body>

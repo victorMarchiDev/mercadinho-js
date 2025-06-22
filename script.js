@@ -1,4 +1,9 @@
 const catalogContainer = document.getElementById('product-catalog');
+const cartItemsContainer = document.getElementById('cart-items');
+const cartTotalElement = document.getElementById('cart-total');
+const checkoutButton = document.getElementById('checkout-button');
+
+let cart = [];
 
 async function fetchProducts() {
   try {
@@ -7,26 +12,110 @@ async function fetchProducts() {
     renderProducts(products);
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
-    catalogContainer.innerHTML = '<p>Erro ao carregar produtos. Tente novamente mais tarde.</p>';
+    catalogContainer.innerHTML = '<p>Erro ao carregar produtos.</p>';
   }
 }
 
 function renderProducts(products) {
-  catalogContainer.innerHTML = ''; // Limpa o container
-
+  catalogContainer.innerHTML = '';
   products.forEach(product => {
-    const productCard = document.createElement('div');
-    productCard.className = 'product-card';
+    const card = document.createElement('div');
+    card.className = 'product-card';
 
-    productCard.innerHTML = `
+    card.innerHTML = `
       <img src="${product.image}" alt="${product.title}">
       <h2 class="product-title">${product.title}</h2>
       <p class="product-price">R$ ${product.price.toFixed(2)}</p>
       <p class="product-description">${product.description}</p>
+      <button onclick="addToCart(${product.id}, '${product.title}', ${product.price})">Adicionar ao Carrinho</button>
     `;
 
-    catalogContainer.appendChild(productCard);
+    catalogContainer.appendChild(card);
   });
 }
+
+function addToCart(id, title, price) {
+  const existingItem = cart.find(item => item.id === id);
+
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({ id, title, price, quantity: 1 });
+  }
+
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  renderCart();
+}
+
+function renderCart() {
+  cartItemsContainer.innerHTML = '';
+  let total = 0;
+
+  cart.forEach(item => {
+    const li = document.createElement('li');
+    total += item.price * item.quantity;
+
+    li.innerHTML = `
+      ${item.title} x${item.quantity} 
+      <button onclick="removeFromCart(${item.id})">Remover</button>
+    `;
+    cartItemsContainer.appendChild(li);
+  });
+
+  cartTotalElement.textContent = total.toFixed(2);
+}
+
+checkoutButton.addEventListener('click', () => {
+  if (cart.length === 0) {
+    alert("Seu carrinho está vazio!");
+    return;
+  }
+
+  const selectedPayment = document.querySelector('input[name="payment"]:checked');
+  if (!selectedPayment) {
+    alert("Selecione uma forma de pagamento para continuar.");
+    return;
+  }
+
+  const paymentMethod = selectedPayment.value;
+  let metodoTexto = '';
+
+  switch (paymentMethod) {
+    case 'cartao':
+      metodoTexto = 'Cartão de Crédito';
+      break;
+    case 'pix':
+      metodoTexto = 'PIX';
+      break;
+    case 'boleto':
+      metodoTexto = 'Boleto';
+      break;
+  }
+
+  alert(`Compra finalizada com sucesso via ${metodoTexto}!\nObrigado pela preferência. 🎉`);
+
+  cart = [];
+  renderCart();
+  document.querySelectorAll('input[name="payment"]').forEach(input => input.checked = false);
+});
+
+
+const cartElement = document.querySelector('.cart');
+const toggleCartBtn = document.getElementById('toggle-cart');
+
+toggleCartBtn.addEventListener('click', () => {
+  cartElement.classList.toggle('open');
+});
+
+const closeCartBtn = document.getElementById('close-cart');
+
+closeCartBtn.addEventListener('click', () => {
+  cartElement.classList.remove('open');
+});
+
 
 fetchProducts();
