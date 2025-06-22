@@ -4,6 +4,8 @@ const cartTotalElement = document.getElementById('cart-total');
 const checkoutButton = document.getElementById('checkout-button');
 
 let cart = [];
+loadCartFromLocalStorage();
+renderCart();
 
 async function fetchProducts() {
   try {
@@ -34,6 +36,18 @@ function renderProducts(products) {
   });
 }
 
+function saveCartToLocalStorage() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function loadCartFromLocalStorage() {
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    cart = JSON.parse(savedCart);
+  }
+}
+
+
 function addToCart(id, title, price) {
   const existingItem = cart.find(item => item.id === id);
 
@@ -44,11 +58,13 @@ function addToCart(id, title, price) {
   }
 
   renderCart();
+  saveCartToLocalStorage();
 }
 
 function removeFromCart(id) {
   cart = cart.filter(item => item.id !== id);
   renderCart();
+  saveCartToLocalStorage();
 }
 
 function renderCart() {
@@ -100,6 +116,7 @@ checkoutButton.addEventListener('click', () => {
 
   cart = [];
   renderCart();
+  saveCartToLocalStorage();
   document.querySelectorAll('input[name="payment"]').forEach(input => input.checked = false);
 });
 
